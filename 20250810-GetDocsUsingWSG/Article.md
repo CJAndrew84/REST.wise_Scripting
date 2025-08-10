@@ -11,6 +11,8 @@ Result: One command gives you fresh data, no endless clicking.
 ### The story: 
 Why I started automating this It’s Friday afternoon. The plan was to leave early. Someone — let’s call them Dave — asks for “a quick list of all the files in this project, with dates, names, and file types.”
 
+![IT Crowd Moss What GIF](https://i.makeagif.com/media/4-02-2019/lY6SX8.gif)
+
 You open ProjectWise, click into the folder, and start scrolling. The list is long enough to make your mouse wheel squeak. You copy-paste into Excel, only to realise you’ve missed a folder… and another folder… and now your “quick” task has eaten 45 minutes and most of your patience.
 
 That was me — until I stopped doing it the hard way. Now, I run one script, get exactly what I need, and go back to thinking about a Chinese takeaway for Friday 
