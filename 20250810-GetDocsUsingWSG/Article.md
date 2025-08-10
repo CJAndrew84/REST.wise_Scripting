@@ -15,7 +15,8 @@ You open ProjectWise, click into the folder, and start scrolling. The list is lo
 
 That was me — until I stopped doing it the hard way. Now, I run one script, get exactly what I need, and go back to thinking about a Chinese takeaway for Friday 
 
-Step-by-Step: Pulling data without the pain
+### Step-by-Step: 
+Pulling data without the pain
 
 1) Get your access token You need to “log in” to ProjectWise programmatically. I’ll walk you through that in an upcoming post. For now
 ``` powershell
@@ -51,7 +52,8 @@ $response.instances | Format-Table
 ```
 Or send it to Power BI, SQL, or anything that doesn’t involve “Final_v4_Really_Final.xlsx” (more on this next time).
 
-Bonus: Adding filters Want only PDFs updated this month?
+### Bonus: 
+Adding filters Want only PDFs updated this month?
 ``` powershell
 $ThisMonth = (Get-Date).ToString("yyyy-MM")
 $Filter = "`$filter=endswith(FileName,'.pdf') and FileUpdateTime ge $ThisMonth-01T00:00:00Z"
