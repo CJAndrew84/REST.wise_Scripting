@@ -1,81 +1,74 @@
 # From REST to Raw Speed: Building a ProjectWise Doc Register with SQL (and a Friendly UI)
 
-## TL;DR: 
-Last time, I pulled a ProjectWise document list with the WSG REST API — reliable, supported, and portable. This time, I’m going straight to the database with SQL via PowerShell for speed and flexibility. Added bonus: a WinForms UI so you can pick a datasource and folder without typing. The script:
+TL;DR: 
+Last time, I pulled a ProjectWise document list using the WSG REST API — reliable, supported, and portable. This time, I’m going straight to the database with SQL via PowerShell for speed, version control, and a better UI. Bonus: a WPF interface with icons, buttons, and expandable rows.
 
-Lets you select a datasource from a dropdown
+In this post I show you the code to build your own UI (customise the one I have included below), and use a SQL SELECT statement to grab data directly from the database tables and join tables and display in your nice UI.  
 
-Lets you browse for a folder in ProjectWise
+Fair warning, this article contains a lot of code.
 
-Runs a read-only SQL query to get the latest doc versions
+Minimize image
+Edit image
+Delete image
 
-Exports the results to Excel in seconds
+Add a caption (optional)
+The full code should:
+
+Lets you select a datasource from a TreeView
+
+Lets you browse rich projects inside that datasource
+
+Runs a read-only SQL query to get all docs + versions under the selected project
+
+Groups results by document and shows version history inline
+
+Exports the register to Excel with one click
 
 Use SQL if you have DB access and need results fast. Use WSG if you want official, portable, no-DB-required queries.
 
-[GIF: Star Wars hyperspace jump]
+Minimize image
+Edit image
+Delete image
 
+Add a caption (optional)
 
-## Story
-Last issue, I pulled a document list with the WSG REST API. It was tidy, blessed, and very “by the book.”
+The Story (Why)
+Last issue, I pulled a document list with the WSG REST API. It was tidy, but not very fast.
 
-But sometimes… you want raw speed. No paging, no property decoding, no waiting for the API to sip its coffee.
+And time is money… we want raw speed. No paging. No property decoding. No waiting for the API and drinking coffee.
 
-This time I’m going straight to the source — the ProjectWise database — with a single SQL statement. And yes, we’re doing it in PowerShell. And yes, we’re giving it buttons.
+Minimize image
+Edit image
+Delete image
 
-The result: a one-click document register to Excel. You choose a datasource, browse to a project folder, and out pops a register. No paging. No loops. No “let me decode that WSG payload for you” step.
+Add a caption (optional)
+This time I’m going straight to the source — the ProjectWise database — with a single SQL statement. And yes, we’re doing it in PowerShell. And yes, we’re giving it buttons. And icons. And expandable rows.
 
-[GIF: MCU Quicksilver doing the slow-mo speed run]
+The result: a one-click document register to Excel, with version history baked in. You choose a datasource, expand a project, click a button, and out pops a register. No paging. No loops. No “let me decode that WSG payload for you” step.
 
+Minimize image
+Edit image
+Delete image
 
-## What we’re building
-A PowerShell script with a WinForms dropdown and folder browser
+Add a caption (optional)
 
-A direct SQL query (read-only) that targets your chosen folder + subfolders
+What we’re building
+A PowerShell script with a WPF UI
+
+A direct SQL query (read-only) that targets your chosen rich project + subfolders
+
+A grouped register with expandable version rows
 
 An Excel export with project number + timestamp in the filename
 
-### Flowchart explaining the process
-```mermaid
-graph TD
-    subgraph "Setup"
-        A[Start] --> B[List available ProjectWise Datasources]
-        B --> C{Show Datasource Selection Dialog}
-    end
 
-    subgraph "ProjectWise Connection"
-        C -- OK --> D[Login to selected Datasource via Bentley IMS]
-        C -- Cancel --> E[Exit Script]
-        D --> F{Show Project Folder Browser}
-    end
-
-    subgraph "Data Query"
-        F -- Folder Selected --> G[Get Project ID]
-        F -- Cancel --> E
-        G --> H[Build SQL Query for documents]
-        H --> I[Execute SQL Query]
-    end
-
-    subgraph "Data Processing & Export"
-        I --> J[Convert SQL results to DataTable]
-        J --> K[Display results in console]
-        K --> L[Define Excel file path in C:\Temp]
-        L --> M[Export DataTable to Excel]
-    end
-
-    subgraph "Finalization"
-        M --> N[Open the generated Excel file]
-        N --> O[End]
-    end
-```
-
-## When to use this vs WSG (the 10-second version)
+When to use this vs WSG (the 10-second version)
 Use SQL when you have DB access and need speed + full control over joins/columns.
 
 Use WSG when you want officially supported, portable, and no DBA required.
 
 
-## Prerequisites
+Prerequisites
 Windows PowerShell 5.1 (or PowerShell 7 started with -STA for WinForms)
 
 PWPS_DAB module (ProjectWise cmdlets)
@@ -85,232 +78,756 @@ ImportExcel module for Export-Excel
 Read-only access to the ProjectWise DB via Select-PWSQL (through PWPS_DAB)
 
 
-## Step-by-step (with “why” sprinkled in)
-Pick your datasource Dropdown lists your PW datasources so you don’t fat-finger names. The combobox is bound to a Name property so it shows actual names.
+Step-by-step (with “why” sprinkled in)
+Pick your datasource - TreeView lists your PW datasources. No typing. Just click.
 
-Pick your folder We use the standard PW folder browser. The SQL leverages dsqlGetSubFolders to include all subfolders.
+Browse rich projects - Expand a datasource to lazy-load its rich projects. Each project gets a button.
 
-Run the SQL Two queries in this example:
+Click to run SQL - The button runs a grouped SQL query that pulls all versions under the selected project.
 
-Export to Excel Converts to a DataTable, timestamps the filename, and writes a neat worksheet named with the project number.
+Group + display - Documents are grouped by original GUID. Latest version shown in the grid. Older versions shown inline via RowDetailsTemplate.
 
-(Optional) Quick preview Swap in a DataGridView for an instant grid preview.
+Export to Excel - One click. Instant register. Timestamped filename. Worksheet named after the project.
 
-[GIF: Friends “Pivot!” couch scene—because yes, we’re pivoting from REST to SQL]
+Minimize image
+Edit image
+Delete image
+
+Add a caption (optional)
+
+The code
 
 
-## The code
+Maximize image
+Edit image
+Delete image
 
-### Prerequisites
-``` powershell
-#requires -Version 5.1
-# If using PowerShell 7, start as: pwsh.exe -STA
+Add a caption (optional)
 
-#region "Check Powershell Modules required are install and imported"
-$Modules = @([PSCustomObject]@{Name = "PWPS_DAB" }, [PSCustomObject]@{Name = "ImportExcel" })
-foreach ($Module in $Modules) {
-    $ModuleName = $Module.Name
-    $isInstalled = (Get-Module -ListAvailable -Name $ModuleName).Count -gt 0
-    $isImported = (Get-Module -Name $ModuleName).Count -gt 0
+Add-Type -AssemblyName PresentationFramework
 
-    if ($isInstalled -and $isImported) {
-        Write-Host "$ModuleName is installed and imported."
-    }
-    elseif ($isInstalled -and -not $isImported) {
-        Write-Host "$ModuleName is installed but not imported. Importing now..."
-        Import-Module $ModuleName -ErrorAction Stop 
-    }
-    else {
-        Write-Host "$ModuleName is not installed. Installing now..."
-        Install-Module -Name $ModuleName -Scope CurrentUser -Force
-        Import-Module $ModuleName -ErrorAction Stop
-    }
-}
-#endregion
-```
+# Load XAML
+$xaml = Get-Content "path-to-xaml.xaml" -Raw
+$reader = [System.Xml.XmlReader]::Create([System.IO.StringReader]$xaml)
+$window = [Windows.Markup.XamlReader]::Load($reader)
 
-### Winform Dialog Function
-``` powershell
-function Show-ComboBoxDialog {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [string]$Title,
-        [Parameter(Mandatory)]
-        [array]$ComboBoxItems,
-        [string]$DisplayMember = $null
-    )
+# Find the Image control
+$footerImage = $window.FindName("FooterImage")
 
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-Type -AssemblyName System.Drawing
-    [System.Windows.Forms.Application]::EnableVisualStyles()
+# Set the PNG image source
+$imagePath = "path-to-footer logo.png"  # Replace with your actual path
+$uri = New-Object System.Uri($imagePath, [System.UriKind]::Absolute)
+$bitmap = New-Object System.Windows.Media.Imaging.BitmapImage
+$bitmap.BeginInit()
+$bitmap.UriSource = $uri
+$bitmap.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
+$bitmap.EndInit()
 
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = $Title
-    $form.Size = New-Object System.Drawing.Size(450, 200)
-    $form.StartPosition = 'CenterScreen'
-    $form.TopMost = $true
+$footerImage.Source = $bitmap
+$title = "{REST:wise} Scripting - Example UI for Doc Register"
+$window.Title = $title
+$appName = $window.FindName("AppName")
 
-    $comboBox = New-Object System.Windows.Forms.ComboBox
-    $comboBox.Location = New-Object System.Drawing.Point(50, 30)
-    $comboBox.Size = New-Object System.Drawing.Size(350, 30)
-    $comboBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-    if ($DisplayMember) { $comboBox.DisplayMember = $DisplayMember }
-    $comboBox.Items.AddRange($ComboBoxItems)
+$appName.FontFamily = "Arial"
+$appName.Text = $title
+$appName.FontSize = "32"
+$appName.Foreground = "#4ec9b0"
 
-    if ($ComboBoxItems.Count -gt 0) { $comboBox.SelectedIndex = 0 }
+$leftPanel = $window.FindName("LeftPanelContent")
 
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Text = 'OK'
-    $okButton.Location = New-Object System.Drawing.Point(50, 80)
-    $okButton.Add_Click({
-        $form.DialogResult = [System.Windows.Forms.DialogResult]::OK
-        $form.Close()
-    })
+# Create TreeView
+$treeView = New-Object System.Windows.Controls.TreeView
+$treeView.Name = "ProjectTree"
+$treeView.Margin = "10"
 
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.Location = New-Object System.Drawing.Point(150, 80)
-    $cancelButton.Add_Click({
-        $form.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-        $form.Close()
-    })
+$mainGrid = $window.FindName("MainPanelContent")
 
-    $form.Controls.Add($comboBox)
-    $form.Controls.Add($okButton)
-    $form.Controls.Add($cancelButton)
-    $form.AcceptButton = $okButton
-    $form.CancelButton = $cancelButton
-    $form.Add_Shown({ $form.Activate() })
 
-    $result = $form.ShowDialog()
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) { return $comboBox.SelectedItem }
-    return $null
-}
-```
-### Custom Convert to DataTable Function
-``` powershell
-function ConvertTo-DataTable {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [PSObject[]]$InputObject
-    )
-    BEGIN { $dataTable = New-Object System.Data.DataTable; $columnsAdded = $false }
-    PROCESS {
-        foreach ($obj in $InputObject) {
-            if (-not $columnsAdded) {
-                foreach ($prop in $obj.PSObject.Properties) {
-                    $type = if ($prop.Value -eq $null) { [string] } else { $prop.Value.GetType() }
-                    [void]$dataTable.Columns.Add($prop.Name, $type)
-                }
-                $columnsAdded = $true
+# Find the style resources
+$mainStyle = $window.FindResource("MainDataGridStyle")
+$childStyle = $window.FindResource("ChildDataGridStyle")
+$dsTemplate = $window.FindResource("DatabaseTemplate")
+$projTemplate = $window.FindResource("ProjectTemplate")
+
+
+$buttonRibbon = $window.FindName("ButtonRibbon")
+
+# Create Export Button
+$exportButton = New-Object System.Windows.Controls.Button
+$exportButton.Content = "Export to Excel"
+$exportButton.Margin = "5"
+$exportButton.ToolTip = "Export the register to Excel"
+
+# Add Click event handler
+$exportButton.Add_Click({
+        try {
+            if ($script:data -and $script:data.Rows.Count -gt 0) {
+                $script:data | Export-Excel -AutoSize -WorksheetName "Register" -Show
             }
-            $row = $dataTable.NewRow()
-            foreach ($prop in $obj.PSObject.Properties) {
-                try { $row[$prop.Name] = $prop.Value } catch { $row[$prop.Name] = [string]$prop.Value }
+            else {
+                [System.Windows.MessageBox]::Show("No data available to export.", "Export Failed", "OK", "Error")
             }
-            [void]$dataTable.Rows.Add($row)
         }
-    }
-    END { $dataTable }
-}
-```
+        catch {
+            [System.Windows.MessageBox]::Show("Export failed: $($_.Exception.Message)", "Error", "OK", "Error")
+        }
+    })
 
-### 1) Pick a datasource
-``` powershell
-$Datasources = Show-PWDatasources
-$pwDatasources = foreach ($d in $Datasources) { [PSCustomObject]@{ Name = $d } }
+# Add the button to the ribbon
+$buttonRibbon.Children.Add($exportButton)
 
-$result = Show-ComboBoxDialog -Title 'Select a Datasource' -ComboBoxItems $pwDatasources -DisplayMember 'Name'
-if (-not $result) { Write-Host 'Cancelled.'; return }
-$dataSource = $result.Name
-```
+$datasource = Get-PWDSConfigEntry
 
-### 2) Login
-``` powershell
-New-PWLogin -DatasourceName $dataSource -BentleyIMS -NonAdminLogin | Out-Null
-```
-### 3) Pick a folder
-``` powershell
-$projectFolder = Show-PWFolderBrowserDialog -DialogTitle 'Browse for project'
-if (-not $projectFolder) { Write-Host 'No folder selected.'; return }
+$projectName = ""
 
-$projectFolderName  = $projectFolder.Name
-$projectNumber      = $projectFolder.ProjectProperties['PROJECT_Project_Number']
-$ProjectID          = $projectFolder.ProjectID
-$ReportDate         = Get-Date -Format 'yyyy-MM-dd_HH-mm'
-```
-### 4) SQL queries
-``` powershell
-$sqlLatestPerOrigGuid = @"
-SELECT
-    D.o_docguid           AS DocGuid,
-    D.o_itemname          AS Document_Name,
-    D.o_dmsdate           AS CheckedOut_Date,
-    D.o_version           AS Version,
-    S.o_statename         AS State,
-    D.o_origguid,
-    D.o_version_seq
-FROM dms_doc D
-JOIN dms_stat S ON D.o_stateno = S.o_stateno
-JOIN (SELECT o_projectno FROM dbo.dsqlGetSubFolders(1, $ProjectID, 0)) AS SubProjects
-  ON D.o_projectno = SubProjects.o_projectno
-JOIN (
-    SELECT o_origguid, MAX(o_version_seq) AS MaxSeq
-    FROM dms_doc
-    WHERE o_projectno IN (SELECT o_projectno FROM dbo.dsqlGetSubFolders(1, $ProjectID, 0))
-      AND o_size <> 0
-    GROUP BY o_origguid
-) AS MaxVersions
-  ON D.o_origguid = MaxVersions.o_origguid AND D.o_version_seq = MaxVersions.MaxSeq
-WHERE D.o_size <> 0
-ORDER BY D.o_itemname;
+$data = @()
+$grpData = @()
+
+$datasource.ForEach({
+        $item = $_
+        $treeItem = New-Object System.Windows.Controls.TreeViewItem
+        # Create StackPanel for header
+        $headerPanel = New-Object System.Windows.Controls.StackPanel
+        $headerPanel.Orientation = "Horizontal"
+    
+        # Add icon
+        $icon = New-Object System.Windows.Controls.Image
+        $icon.Source = [System.Windows.Media.Imaging.BitmapImage]::new([Uri]::new("Database-icon.png"))
+        $icon.Width = 16
+        $icon.Height = 16
+        $icon.Margin = "0,0,5,0"
+        $headerPanel.Children.Add($icon)
+
+        # Add label
+        $label = New-Object System.Windows.Controls.Label
+        $label.Content = $item.Name
+        $label.Foreground = $window.Resources["PrimaryBrush"]
+        $headerPanel.Children.Add($label)
+    
+        # Assign header
+        $treeItem.Header = $headerPanel
+        $treeItem.Tag = $item
+    
+        # Add dummy child to show expand arrow
+        $treeItem.Items.Add("Loading...")
+
+        # Attach lazy loading handler
+        $treeItem.Add_Expanded({
+                param($sender, $args)
+
+                if ($sender.Items.Count -eq 1 -and $sender.Items[0] -eq "Loading...") {
+                    $sender.Items.Clear()
+
+                    $fullpath = $sender.Tag.Name
+                    $token = Get-PWConnectionClientToken -UsePWRelyingParty
+                    $successLogin = New-PWLogin -DatasourceName $fullpath -BentleyIMS -Token $token
+
+                    if ($successLogin.ToString() -eq "True") {
+                        $rps = Get-PWRichProjects -PopulateProjectProperties
+
+                        $rps.ForEach({
+                                $project = $_
+                                $projectID = $project.ProjectID
+                                $projectName = $project.Name
+                    
+                                # Create Grid layout
+                                $grid = New-Object System.Windows.Controls.Grid
+                                $grid.ColumnDefinitions.Add((New-Object System.Windows.Controls.ColumnDefinition))
+                                $grid.ColumnDefinitions.Add((New-Object System.Windows.Controls.ColumnDefinition))
+
+                                # Create inner StackPanel for icon + label
+                                $leftPanel = New-Object System.Windows.Controls.StackPanel
+                                $leftPanel.Orientation = "Horizontal"
+
+                                # Icon
+                                $icon = New-Object System.Windows.Controls.Image
+                                $icon.Source = [System.Windows.Media.Imaging.BitmapImage]::new([Uri]::new("Project-icon.png"))
+                                $icon.Width = 16
+                                $icon.Height = 16
+                                $icon.Margin = "0,0,5,0"
+                                $leftPanel.Children.Add($icon)
+
+                                # Label
+                                $label = New-Object System.Windows.Controls.TextBlock
+                                $label.Text = $project.Name
+                                $label.VerticalAlignment = "Center"
+                                $label.Margin = "0,0,10,0"
+                                $leftPanel.Children.Add($label)
+
+                                # Place leftPanel in column 0
+                                [System.Windows.Controls.Grid]::SetColumn($leftPanel, 0)
+                                $grid.Children.Add($leftPanel)
+
+                                # Button
+                                $button = New-Object System.Windows.Controls.Button
+                                $button.Content = [char]0x25B6
+                                $button.Tag = $projectID
+                                $button.Width = 30
+                                $button.Height = 20
+                                $button.ToolTip = "Run SQL for $($project.Name)"
+                                $button.HorizontalAlignment = "Right"
+
+                                # Place button in column 1
+                                [System.Windows.Controls.Grid]::SetColumn($button, 1)
+                                $grid.Children.Add($button)
+                    
+                                $button.Add_Click({
+                                        param($s, $e)
+                                        try {
+                                            $sqlStatementGetAllVersions = "
+    SELECT 
+        D.o_docguid AS DocGuid, 
+        D.o_itemname AS Document_Name, 
+        D.o_dmsdate AS CheckedOut_Date, 
+        D.o_version AS Version, 
+        S.o_statename AS State,
+        D.o_origguid AS OrigGUID,
+        D.o_version_seq AS VersionSeq,
+        ROW_NUMBER() OVER (PARTITION BY D.o_origguid ORDER BY D.o_version_seq DESC) AS rn
+    FROM 
+        dms_doc D 
+    JOIN 
+        dms_stat S ON D.o_stateno = S.o_stateno 
+    JOIN 
+        (SELECT o_projectno FROM dbo.dsqlGetSubFolders (1, $($s.Tag), 0)) AS SubProjects 
+        ON D.o_projectno = SubProjects.o_projectno 
+    WHERE 
+        D.o_size != 0
+"
+
+                                            $SQLResults = Select-PWSQL -SQLSelectStatement $sqlStatementGetAllVersions
+                        
+                                            $groupedData = @()
+
+                                            # Convert DataTable rows to array for easier processing
+                                            $rows = @()
+                                            foreach ($row in $SQLResults.Rows) {
+                                                $rows += $row
+                                            }
+
+                                            # Find parent rows 
+                                            $parents = ($rows | ConvertTo-DataTable).Select( "OrigGUID = ''")
+
+                                            foreach ($parent in $parents) {
+                                                $parentGuid = $parent.DocGuid
+
+                                                # Find child rows where o_origguid matches parent's o_docguid
+                                                $children = $rows | Where-Object { $_.OrigGUID -eq $parentGuid }
+
+                                                # Combine parent and children, then sort by VersionSeq descending
+                                                $allVersions = @($parent) + $children
+                                                $sortedVersions = $allVersions | Sort-Object { $_.VersionSeq } -Descending
+    
+                                                # Select only the desired columns
+                                                $cleanedVersions = @($sortedVersions | ForEach-Object {
+                                                        [PSCustomObject]@{
+                                                            Document_Name   = $_.Document_Name
+                                                            Version         = $_.Version
+                                                            State           = $_.State
+                                                            CheckedOut_Date = $_.CheckedOut_Date
+                                                            DocGuid         = $_.DocGuid
+                                                        }
+                                                    })
+
+                                                if ($cleanedVersions.Count -gt 0) {
+                                                    $groupedData += [PSCustomObject]@{
+                                                        Versions         = $cleanedVersions
+                                                        DocumentName     = $cleanedVersions[0].Document_Name
+                                                        VersionCount     = $cleanedVersions.Count
+                                                        CurrentVersion   = $cleanedVersions[0].Version
+                                                        CurrentState     = $cleanedVersions[0].State
+                                                        LastCheckOutDate = $cleanedVersions[0].CheckedOut_Date
+                                                    }
+                                                }
+
+                                            }
+
+                                            foreach ($group in $groupedData) {
+                                                if ($group.Versions.Count -gt 1) {
+                                                    $group | Add-Member -MemberType NoteProperty -Name FilteredVersions -Value $group.Versions[1..($group.Versions.Count - 1)]
+                                                }
+                                                else {
+                                                    $group | Add-Member -MemberType NoteProperty -Name FilteredVersions -Value @()
+                                                }
+                                            }
+
+                                            $script:grpData = $groupedData
+
+                                            # Create DataGrid
+                                            $dataGrid = New-Object System.Windows.Controls.DataGrid
+                                            $dataGrid.Style = $mainStyle
+
+                                            $dataGrid.AutoGenerateColumns = $false
+                                            $dataGrid.Margin = "10"
+                                            $dataGrid.ItemsSource = $groupedData
+                                            $dataGrid.RowDetailsVisibilityMode = "VisibleWhenSelected"
+                                            $dataGrid.IsReadOnly = $true
+
+                                            # Optional: Add summary column for latest version name
+                                            $colLatestName = New-Object System.Windows.Controls.DataGridTextColumn
+                                            $colLatestName.Header = "Document Name"
+                                            $colLatestName.Binding = New-Object System.Windows.Data.Binding("Versions[0].Document_Name")
+                                            $dataGrid.Columns.Add($colLatestName)
+
+                                            # Optional: Add summary column for version count
+                                            $colCount = New-Object System.Windows.Controls.DataGridTextColumn
+                                            $colCount.Header = "Version Count"
+                                            $colCount.Binding = New-Object System.Windows.Data.Binding("Versions.Count")
+                                            $dataGrid.Columns.Add($colCount)
+
+                                            # Optional: Add summary column for version count
+                                            $colVer = New-Object System.Windows.Controls.DataGridTextColumn
+                                            $colVer.Header = "Current Version"
+                                            $colVer.Binding = New-Object System.Windows.Data.Binding("Versions[0].Version")
+                                            $dataGrid.Columns.Add($colVer)
+
+                                            # Optional: Add summary column for version count
+                                            $colState = New-Object System.Windows.Controls.DataGridTextColumn
+                                            $colState.Header = "Current State"
+                                            $colState.Binding = New-Object System.Windows.Data.Binding("Versions[0].State")
+                                            $dataGrid.Columns.Add($colState)
+
+                                            # Optional: Add summary column for version count
+                                            $colDate = New-Object System.Windows.Controls.DataGridTextColumn
+                                            $colDate.Header = "Last Check Out Date"
+                                            $binding = New-Object System.Windows.Data.Binding("Versions[0].CheckedOut_Date")
+                                            $binding.StringFormat = "dd/MM/yyyy HH:mm:ss"  # Or "yyyy-MM-dd", etc.
+                                            $colDate.Binding = $binding
+                                            $dataGrid.Columns.Add($colDate)
+
+                                            # Create RowDetailsTemplate using FrameworkElementFactory
+                                            $rowDetailsTemplate = New-Object System.Windows.DataTemplate
+
+                                            # ItemsControl to hold the list of versions
+                                            $itemsControlFactory = New-Object System.Windows.FrameworkElementFactory([System.Windows.Controls.ItemsControl])
+                                            $itemsControlFactory.SetBinding(
+                                                [System.Windows.Controls.ItemsControl]::ItemsSourceProperty,
+                                                (New-Object System.Windows.Data.Binding("FilteredVersions"))
+                                            )
+
+                                            $xamlTemplate = @"
+<DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <DataGrid ItemsSource="{Binding FilteredVersions}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              HeadersVisibility="Column"
+              Background="#F8FAEB"
+              Foreground="#333333"
+              BorderBrush="#B3CB37"
+              FontSize="13"
+              RowBackground="White"
+              AlternatingRowBackground="#F0F0F0"
+              GridLinesVisibility="Horizontal">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Document Name" Binding="{Binding Document_Name}" />
+            <DataGridTextColumn Header="Version" Binding="{Binding Version}" />
+            <DataGridTextColumn Header="State" Binding="{Binding State}" />
+            <DataGridTextColumn Header="CheckedOut Date" Binding="{Binding CheckedOut_Date}" />
+        </DataGrid.Columns>
+    </DataGrid>
+</DataTemplate>
 "@
 
-$sqlTopLevelDocs = @"
-SELECT
-    D.o_docguid           AS DocGuid,
-    D.o_itemname          AS Document_Name,
-    D.o_dmsdate           AS CheckedOut_Date,
-    D.o_version           AS Version,
-    S.o_statename         AS State
-FROM dms_doc D
-JOIN dms_stat S ON D.o_stateno = S.o_stateno
-JOIN (SELECT o_projectno FROM dbo.dsqlGetSubFolders(1, $ProjectID, 0)) AS SubProjects
-  ON D.o_projectno = SubProjects.o_projectno
-WHERE D.o_size <> 0
-  AND D.o_origguid IS NULL
-ORDER BY D.o_itemname;
-"@
+                                            $reader = [System.Xml.XmlReader]::Create([System.IO.StringReader]$xamlTemplate)
+                                            $rowDetailsTemplate = [Windows.Markup.XamlReader]::Load($reader)
 
-$sqlStatement = $sqlLatestPerOrigGuid  # or $sqlTopLevelDocs
-Set-Clipboard -Value $sqlStatement
-```
-### 5) Run SQL and export
-``` powershell
-$SQLResults = Select-PWSQL -SQLSelectStatement $sqlStatement
-if (-not $SQLResults) { Write-Warning 'No results.'; return }
+                                            $dataGrid.RowDetailsTemplate = $rowDetailsTemplate
 
-$dt = $SQLResults | ConvertTo-DataTable
-$FileName = "C:\Temp\${projectFolderName}-DocumentRegister_${ReportDate}.xlsx"
-$sheet   = if ($projectNumber) { "$projectNumber-DocReg" } else { "DocReg" }
+                                            $mainGrid.Children.Clear()
+                                            $mainGrid.Children.Add($dataGrid)
+                        
+                                            $rows = @()
 
-$null = New-Item -ItemType Directory -Path (Split-Path $FileName) -Force
-$dt | Export-Excel -Path $FileName -WorksheetName $sheet -AutoSize
+                                            foreach ($group in $groupedData) {
+                                                # Add a header row for the group
+                                                $rows += [PSCustomObject]@{
+                                                    DocGUID         = $group.Versions[0].DocGuid
+                                                    Document_Name   = $group.DocumentName
+                                                    Version         = $group.CurrentVersion
+                                                    State           = $group.CurrentState
+                                                    CheckedOut_Date = $group.LastCheckOutDate
+                                                }
 
-Write-Host "Exported: $FileName"
-```
+                                                # Add each version row
+                                                # Skip the first version (index 0)
+                                                $versions = $group.Versions
+                                                for ($i = 1; $i -lt $versions.Count; $i++) {
+                                                    $version = $versions[$i]
 
-## WSG vs SQL — the “how it feels” comparison
+                                                    $rows += [PSCustomObject]@{
+                                                        VersionGuid     = $version.DocGuid
+                                                        Document_Name   = $version.Document_Name
+                                                        Version         = $version.Version
+                                                        State           = $version.State
+                                                        CheckedOut_Date = $version.CheckedOut_Date
+                                                    }
+                                                }
+                                            }
+
+                                            $script:data = $rows
+                                        }
+                                        catch {
+                                            Write-Host "An error occurred: $($_.Exception.Message)"
+                                            $errorText = New-Object System.Windows.Controls.TextBlock
+                                            $errorText.Text = "Failed to retrieve Register"
+                                            $errorText.VerticalAlignment = "Center"
+                                            $errorText.HorizontalAlignment = "Center"
+                            
+                                            $mainGrid.Children.Clear()
+                                            $mainGrid.Children.Add($errorText)
+                                        }
+                        
+                                    })
+                    
+                                $projectItem = New-Object System.Windows.Controls.TreeViewItem
+                                $projectItem.Header = $grid
+                                #$projectItem.HeaderTemplate = $projTemplate
+                                $sender.Items.Add($projectItem)
+                            })
+                    }
+                    else {
+                        $errorItem = New-Object System.Windows.Controls.TreeViewItem
+                        $errorItem.Header = "Login failed"
+                        $sender.Items.Add($errorItem)
+                    }
+                }
+            })
+
+
+
+        $treeView.Items.Add($treeItem)
+    })
+
+# Add TreeView to LeftPanel
+$leftPanel.Children.Add($treeView)
+
+# Show the window
+$window.ShowDialog()
+
+The UI (WPF XAML)
+WPF gives us:
+
+A proper layout: header, ribbon, panels
+
+Custom styles and brushes
+
+TreeView with icons and buttons
+
+DataGrid with expandable rows
+
+<!-- x:Class="PowerShellWPF.MainWindow" 
+    xmlns:local="clr-namespace:PowerShellWPF
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d""
+    -->
+    <Window 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        x:Name="MainApp"
+        Title="App Name" Height="800" Width="1600" FontFamily="Yaro St">
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#192d38"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#BEDAE5"/>
+        <SolidColorBrush x:Key="Green" Color="#05E560"/>
+        <SolidColorBrush x:Key="Blue" Color="#3F32F1"/>
+        <SolidColorBrush x:Key="Yellow" Color="#B9FF00"/>
+        <SolidColorBrush x:Key="Purple" Color="#BE02F8"/>
+        <SolidColorBrush x:Key="White" Color="#ffffff"/>
+        <SolidColorBrush x:Key="Black" Color="#000000"/>
+        <FontFamily x:Key="HeaderFont">Gamechanger</FontFamily>
+
+            <!-- Icons from root of solution folder -->
+            <BitmapImage x:Key="DatabaseIcon" UriSource="Database.png"/>
+            <BitmapImage x:Key="ProjectIcon" UriSource="Project.png"/>
+
+            <!-- TreeView Style -->
+            <Style TargetType="TreeView">
+                <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                <Setter Property="BorderThickness" Value="1.5"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+            </Style>
+
+        <!-- Template for Database items -->
+        <DataTemplate x:Key="DatabaseTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{StaticResource DatabaseIcon}" Width="16" Height="16" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding}" Foreground="{StaticResource PrimaryBrush}" FontWeight="Bold"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Template for Project items -->
+        <DataTemplate x:Key="ProjectTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{StaticResource ProjectIcon}" Width="16" Height="16" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding}" Foreground="{StaticResource PrimaryBrush}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <Style x:Key="MainDataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F0F0F0"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        </Style>
+
+        <Style x:Key="ChildDataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background" Value="#F8FAEB"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="BorderBrush" Value="#B3CB37"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F0F0F0"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        </Style>
+
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{StaticResource PrimaryBrush}"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1.5"
+                                CornerRadius="5"
+                                >
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Green}" />
+                    <Setter Property="Foreground" Value="{StaticResource White}" />
+                    <Setter Property="BorderBrush" Value="{StaticResource White}" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="32" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                      x:Name="Border"
+                      Grid.ColumnSpan="2"
+                      CornerRadius="8"
+                      Background="{StaticResource SecondaryBrush}"
+                      BorderBrush="{StaticResource PrimaryBrush}"
+                      BorderThickness="1.5" 
+                    />
+
+                            <Path
+                        x:Name="Arrow"
+                        Grid.Column="1"    
+                        Fill="{TemplateBinding Foreground}"
+                        Stroke="{TemplateBinding Foreground}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Data="M 0 0 L 4 4 L 8 0 Z"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="True" />
+        </ControlTemplate>
+
+        <Style x:Key="theComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="Foreground" Value="#333" />
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinHeight" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton
+                        Cursor="Hand"
+                        x:Name="ToggleButton"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        Background="{TemplateBinding Background}"
+                        Foreground="{TemplateBinding Foreground}"
+                        Style="{StaticResource ComboBoxToggleButton}"
+                        Grid.Column="2"
+                        Focusable="false"
+                        IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                        ClickMode="Press"/>
+
+                            <ContentPresenter
+                        x:Name="ContentSite"
+                        IsHitTestVisible="False"
+                        Content="{TemplateBinding SelectionBoxItem}"
+                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                        Margin="10,3,30,3"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                        Style="{x:Null}"
+                        Template="{StaticResource ComboBoxTextBox}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="3,3,23,3"
+                        Focusable="True"                               
+                        Visibility="Hidden"
+                        IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            <Popup
+                        x:Name="Popup"
+                        Placement="Bottom"
+                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                        AllowsTransparency="True"
+                        Focusable="False"
+                        PopupAnimation="Slide">
+                                <Grid
+                          x:Name="DropDown"
+                          SnapsToDevicePixels="True"               
+                          MinWidth="{TemplateBinding ActualWidth}"
+                          MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border
+                                CornerRadius="8"
+                                x:Name="DropDownBorder"
+                                Background="White"
+                                BorderThickness="1"
+                                BorderBrush="#F6F6F6"
+                                />
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="theComboBoxItem" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border
+                    x:Name="Border"
+                    Padding="5"
+                    Margin="2"
+                    BorderThickness="2,0,0,0"
+                    CornerRadius="0"
+                    Background="Transparent"
+                    BorderBrush="Transparent">
+                            <TextBlock TextAlignment="Left"><InlineUIContainer>
+                        <ContentPresenter />
+                            </InlineUIContainer></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#B3CB37"/>
+                                <Setter TargetName="Border" Property="Background" Value="#F8FAEB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="Header" Height="60"/>
+            <RowDefinition x:Name="Ribbon" Height="60" MinHeight="10" MaxHeight="60"/>
+            <RowDefinition x:Name="RowSplitter" Height="Auto"/>
+            <RowDefinition x:Name="MainPanelRow" Height="*"/>
+            <RowDefinition x:Name="Footer" Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftColumnPanel" Width="Auto" MinWidth="100" MaxWidth="400"/>
+            <ColumnDefinition x:Name="LeftSplitter" Width="Auto"/>
+            <ColumnDefinition x:Name="MainPanelColumn"  Width="*" MinWidth="300" MaxWidth="1400"/>
+            <ColumnDefinition x:Name="RightSplitter" Width="Auto"/>
+            <ColumnDefinition x:Name="RightColumnPanel" Width="Auto" MinWidth="100" MaxWidth="400"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0" Grid.ColumnSpan="5" Background="{StaticResource PrimaryBrush}">
+            <TextBlock x:Name="AppName" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,10,10,10" Text="App Name" FontSize="40" Foreground="{StaticResource SecondaryBrush}" FontFamily="{StaticResource HeaderFont}" FontWeight="Bold"/>
+        </Border>
+
+        <StackPanel x:Name="ButtonRibbon" Grid.Row="1" Grid.ColumnSpan="5" Background="{StaticResource SecondaryBrush}" Orientation="Horizontal">
+            
+        </StackPanel>
+
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="5" Background="{StaticResource PrimaryBrush}" Grid.ColumnSpan="5"/>
+
+        <Border x:Name="LeftPanel" Grid.Row="3" Grid.Column="0" Background="{StaticResource SecondaryBrush}">
+            <Grid x:Name="LeftPanelContent"/>
+        </Border>
+
+        <GridSplitter Grid.Row="3" Grid.Column="1" Width="5" Background="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" />
+
+        <Border x:Name="MainPanel" Grid.Row="3" Grid.Column="2" Background="{StaticResource SecondaryBrush}">
+            <Grid x:Name="MainPanelContent"/>
+        </Border>
+
+        <GridSplitter Grid.Row="3" Grid.Column="3" Width="5" Background="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+
+        <Border x:Name="RightPanel" Grid.Row="3" Grid.Column="4" Background="{StaticResource SecondaryBrush}">
+
+        </Border>
+
+        <Border Grid.Row="4" Grid.ColumnSpan="5" Background="{StaticResource PrimaryBrush}">
+            <Image x:Name="FooterImage" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10"/>
+        </Border>
+    </Grid>
+</Window>
+WSG vs SQL — the “how it feels” comparison
 WSG (REST) Predictable, supported, works everywhere WSG works. You’ll do paging, decode properties, and loop results. Perfect for service accounts and cloud-friendly scripts.
 
 SQL (read-only) Fast and flexible—especially for register reporting. You can join to anything. But you need DB access, and schema changes can break queries.
 
 
-## Side-by-side snippet
-### WSG
-``` powershell
+Side-by-side snippet
+WSG
+
 $top = 100; $skip = 0; $all = @()
 do {
   $url = "$base/repositories/PW_WSG/Document!poly?`$top=$top&`$skip=$skip&$filter=FolderId eq '$FolderId'"
@@ -320,26 +837,26 @@ do {
 } while ($page.instances.Count -eq $top)
 
 $all | Select-Object Name, Version, State | Export-Excel C:\Temp\WSG-DocReg.xlsx
-```
-### SQL
-``` powershell
+
+SQL
+
 $SQLResults = Select-PWSQL -SQLSelectStatement $sqlLatestPerOrigGuid
 $SQLResults | Export-Excel C:\Temp\SQL-DocReg.xlsx
-```
-
-## Lessons learned
-WinForms needs STA: Use Windows PowerShell 5.1 or start PS7 with -STA.
-
-DisplayMember matters: Without it, your combobox shows object type names.
-
-Keep SQL read-only: Select-PWSQL is powerful—don’t update data.
-
-Clipboard helps: Auto-copying the SQL makes debugging and DBA chats painless.
-
-Schema can change: Stay aware of Bentley updates.
 
 
-## Try this next
+Lessons learned
+WPF : Flexible layout, better styling, and richer controls.
+
+Manual header composition: TreeViewItem headers built with Grid for icon + label + button.
+
+SQL grouping: Using ROW_NUMBER() and OrigGUID to group versions.
+
+RowDetailsTemplate: Shows version history inline.
+
+ExportExcel: Still the MVP for quick exports.
+
+
+Try this next
 Add a state filter dropdown that updates the WHERE clause.
 
 Add file type filters (.dgn, .dwg, .pdf).
