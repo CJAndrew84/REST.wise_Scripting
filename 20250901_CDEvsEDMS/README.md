@@ -1,0 +1,3 @@
+# GitHub Article (Markdown Table Version)
+
+...paste full markdown table article here...

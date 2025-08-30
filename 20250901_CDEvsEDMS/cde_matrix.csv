@@ -1,0 +1,8 @@
+Platform,CDE Status,Capability Score,UI/UX Score,Practical Effectiveness
+Bentley ProjectWise,True CDE (when configured),10.0,4,7.6
+Aconex,True CDE (when configured),10.0,5,8.0
+Viewpoint / 4Projects,True CDE (when configured),10.0,6,8.4
+Autodesk Construction Cloud / BIM 360,CDE Simulation,6.0,8,6.8
+Trimble Connect,Partial CDE,6.0,7,6.4
+SharePoint,EDMS,3.0,5,3.8
+Dropbox / Box / Google Drive,EDMS,1.0,8,3.8
