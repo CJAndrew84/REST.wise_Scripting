@@ -205,7 +205,7 @@ Yes — I used ChatGPT to help shape this article. Before you roll your eyes, he
 - We went through 30+ iterations of content.  
 - I asked it to regenerate the full draft 3 times.  
 - We explored 8+ different angles — definitions, scoring, optimism bias, UI/UX, single vs federated, pros/cons, decision matrix, usage guidance.  
-- If I’d done this solo, it would have been 12–15 hours of effort.  
+- If I’d done this solo, it would have been 12–15 hours of effort. But the actual effort, 150+ Turns over multiple weeks, approximately 6-8 hours of my time.
 - And at every step, I anchored it with my own 15 years of ProjectWise admin experience and 25 years in the construction industry.  
 
 The irony isn’t lost on me — I’m calling out AI-driven noise on LinkedIn while using AI to produce this. But here’s the difference:
