@@ -1,3 +1,0 @@
-# LinkedIn Article (Bullet List Version)
-
-...paste full bullet list article here...
