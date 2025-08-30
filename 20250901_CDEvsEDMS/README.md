@@ -16,7 +16,7 @@ So I thought I’d do the next best thing: write this article to share my though
 
 ---
 
-### TL;DR / Executive Summary
+## TL;DR / Executive Summary
 - All CDEs are EDMSs — but not all EDMSs are CDEs  
 - A true CDE must follow ISO 19650 principles: information states, controlled workflows, metadata, and access tied to state  
 - ProjectWise, Aconex, and Viewpoint/4Projects are CDE-capable — but only when configured correctly  
@@ -27,7 +27,7 @@ So I thought I’d do the next best thing: write this article to share my though
 
 ---
 
-### My Story — Why I Think I Can Provide Insight into CDEs vs EDMS
+## My Story — Why I Think I Can Provide Insight into CDEs vs EDMS
 
 I’ve spent 25 years in the construction industry, and the last 15 of those working with ProjectWise.
 
@@ -50,76 +50,59 @@ And yes, I’m very much in the ProjectWise camp — because when it’s configu
 
 ---
 
-Single vs Federated CDEs
+## Single vs Federated CDEs
 
 A common misconception is that a CDE is always one big platform where everything lives.
 In reality, ISO 19650 allows for two models:
 
-1. Single Repository CDE
+### Single Repository CDE
 
 One platform, all participants onboarded.
 
-Pros:
+#### Pros:
 
-Clean, simple governance
+- Clean, simple governance
+- Everyone working in the same environment
+- Great for single-party projects or where the final handover is paper-based (booo)
 
-Everyone working in the same environment
+#### Cons:
 
-Great for single-party projects or where the final handover is paper-based (booo)
+- Expensive licensing if many external parties need access
+- Heavy onboarding burden (training, permissions, ongoing support)
+- Doesn’t always fit when different stakeholders already have entrenched systems
 
-
-Cons:
-
-Expensive licensing if many external parties need access
-
-Heavy onboarding burden (training, permissions, ongoing support)
-
-Doesn’t always fit when different stakeholders already have entrenched systems
-
-
-2. Federated / Connected Systems CDE
+### Federated / Connected Systems CDE
 
 Different parties use different systems (design in ProjectWise, contractors in ACC, client on SharePoint).
 As long as they’re linked with agreed rules, metadata standards, and state transitions, they collectively form the CDE.
 
-Pros:
+#### Pros:
 
-Lets each party use tools they already know (less training pain)
+- Lets each party use tools they already know (less training pain)
+- Flexible and scalable for complex, multi-organisation projects
+- Avoids forcing “one system to rule them all” when that’s not realistic
+- Easier to meet diverse client/contractor IT and security policies
 
-Flexible and scalable for complex, multi-organisation projects
+#### Cons:
 
-Avoids forcing “one system to rule them all” when that’s not realistic
-
-Easier to meet diverse client/contractor IT and security policies
-
-
-Cons:
-
-Governance overhead — you need clear rules on what lives where
-
-Risk of EDMSs sneaking in and being mistaken for the CDE
-
-Metadata and audit trails can get lost in transfers if rules aren’t tight
-
-Higher chance of disputes if two systems claim to be the “single source of truth”
-
+- Governance overhead — you need clear rules on what lives where
+- Risk of EDMSs sneaking in and being mistaken for the CDE
+- Metadata and audit trails can get lost in transfers if rules aren’t tight
+- Higher chance of disputes if two systems claim to be the “single source of truth”
 
 Using an EDMS inside a federated setup isn’t a problem, as long as its role is defined and the governance keeps states and auditability intact. The issue is only when the EDMS is treated as the CDE.
 
-
 ---
 
-What’s Out There — and Who Passes the “True CDE” Test?
+## What’s Out There — and Who Passes the “True CDE” Test?
 
-Legend:
+### Legend:
 
-True CDE (when configured) = CDE-capable platforms that meet ISO 19650 with proper setup
+**True CDE** (when configured) = CDE-capable platforms that meet ISO 19650 with proper setup
 
-CDE Simulation/Partial = Can mimic or partially support, but not fully ISO-compliant
+**CDE Simulation/Partial** = Can mimic or partially support, but not fully ISO-compliant
 
-EDMS only = Useful for storage and sharing, but not a CDE
-
-### What’s Out There — and Who Passes the “True CDE” Test?
+**EDMS only** = Useful for storage and sharing, but not a CDE
 
 | Platform | CDE Status | Where It Passes | Where It Fails | Capability Score | UI/UX Score | Practical Effectiveness | Best Used For |
 |----------|------------|-----------------|----------------|-----------------|-------------|-------------------------|---------------|
@@ -132,7 +115,8 @@ EDMS only = Useful for storage and sharing, but not a CDE
 | Dropbox / Box / Google Drive | EDMS | Easy sharing; simple permissions | No state workflows | 1.0 | 8 | 3.8 | Quick file sharing; small teams |
 
 ---
-A Note on Optimism Bias
+
+## A Note on Optimism Bias
 
 Scoring “capability” assumes perfect configuration, governance, and adoption.
 That’s rarely how projects run.
@@ -142,7 +126,7 @@ That’s why I’ve added a Practical Effectiveness score — blending capabilit
 
 ---
 
-The UI/UX Factor Nobody Talks About
+## The UI/UX Factor Nobody Talks About
 
 Here’s the dirty secret: some of the most compliant CDEs are clunky.
 They tick every ISO box, but feel like they were designed during the Windows XP era.
@@ -154,39 +138,34 @@ Sometimes, better UX delivers better real-world information management than the 
 
 ---
 
-When is an EDMS Enough?
+## When is an EDMS Enough?
 
 An EDMS might be fine if:
 
-ISO 19650 compliance isn’t required
-
-Your team is small and low-risk
-
-You just need basic versioning and permissions
-
-You’re in early design stages
-
-When projects scale, disciplines multiply, or contracts require compliance — that’s when you move up to a true CDE.
+- ISO 19650 compliance isn’t required
+- Your team is small and low-risk
+- You just need basic versioning and permissions
+- You’re in very early design stages
+- When projects scale, disciplines multiply, or contracts require compliance — that’s when you move up to a true CDE.
 
 ---
 
-The ACC / BIM 360 Debate
+## The ACC / BIM 360 Debate
 
 ACC/BIM 360 can act like a CDE if configured well. But permissions are folder-based, not state-based.
 To restrict access, you move files between folders.
 
 Purists say that’s a simulation, not a true CDE.
+
 In a purist CDE:
 
-State changes don’t involve moving the file
-
-Lifecycle history stays intact
-
-Tracking progression is clear — no “Where’s my file now?” games
+- State changes don’t involve moving the file
+- Lifecycle history stays intact
+- Tracking progression is clear — no “Where’s my file now?” games
 
 ---
 
-So How Do You Choose?
+## So How Do You Choose?
 
 It’s tempting to debate endlessly which platform is “the best CDE.” The truth is: they all have strengths and weaknesses.
 
@@ -200,7 +179,6 @@ SharePoint – best for docs, handover, and client comfort.
 
 Dropbox/Box/Drive – best for “quick and dirty” sharing when compliance isn’t even on the radar.
 
-
 But here’s the ultimate reality check:
 The best tool is usually the one you actually have access to.
 
@@ -210,7 +188,7 @@ The trick isn’t to chase the “perfect CDE.” It’s to understand what your
 
 ---
 
-### Disclaimer (and a bit of irony)
+## Disclaimer (and a bit of irony)
 Yes — I used ChatGPT to help shape this article. Before you roll your eyes, here’s the reality:
 
 - We’ve spent over 6 hours of back-and-forth conversation building and refining this piece.  
