@@ -26,21 +26,26 @@ So I thought I’d do the next best thing: write this article to share my though
 
 ---
 
-### My Story
+### My Story — Why I Think I Can Provide Insight into CDEs vs EDMS
+
 I’ve spent 25 years in the construction industry, and the last 15 of those working with ProjectWise.
 
 I started out as a Trainee Draftsman in a small surveying, architecture, and civil engineering business in my hometown. For those first eight years, I did a bit of everything — building surveys, boundary disputes, topo surveys, planning applications, building regs drawings, through to highways and drainage design for residential developments and small energy projects.
 
-From there, I moved into the Highways Design Department of a consultancy, first as a CAD Technician, then becoming an Engineer and eventually stepping into the world of Digital Engineering and Information Management.
+From there, I moved into the Highways Design Department of a consultancy, first as a CAD Technician, then becoming an Engineer, and eventually stepping into the world of Digital Engineering and Information Management.
 
 That journey has exposed me to a huge variety of systems, processes, people, and ways of working — from small, local projects to large-scale infrastructure programmes.
 
-Over that time, I’ve seen:
-- True CDEs doing exactly what ISO 19650 intended  
-- EDMSs pretending to be CDEs with clever folder gymnastics  
-- And “solutions” that were just shiny shared drives in disguise  
+And over that time, I’ve seen it all:
 
-This isn’t theory — it’s from the trenches. And yes, I’m very much in the PW camp.
+True CDEs doing exactly what ISO 19650 intended
+
+EDMSs pretending to be CDEs with clever folder gymnastics
+
+And “solutions” that were just shiny shared drives in disguise
+
+This isn’t theory — it’s lived experience from the trenches.
+And yes, I’m very much in the ProjectWise camp — because when it’s configured right, it’s still the most rounded CDE on the market.
 
 ---
 
