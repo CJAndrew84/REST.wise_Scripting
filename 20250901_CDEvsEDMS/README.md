@@ -51,3 +51,19 @@ This isn’t theory — it’s from the trenches. And yes, I’m very much in th
 | Trimble Connect | Partial CDE | Good model coordination; tagging; versioning | Weak state control and approvals | 6.0 | 7 | 6.4 | Model coordination; small-to-mid projects |
 | SharePoint | EDMS | Versioning; permissions; metadata | No native state transitions | 3.0 | 5 | 3.8 | Document management; Microsoft 365 handover repositories |
 | Dropbox / Box / Google Drive | EDMS | Easy sharing; simple permissions | No state workflows | 1.0 | 8 | 3.8 | Quick file sharing; small teams |
+
+---
+
+### Disclaimer (and a bit of irony)
+Yes — I used ChatGPT to help shape this article. Before you roll your eyes, here’s the reality:
+
+- We’ve spent over 6 hours of back-and-forth conversation building and refining this piece.  
+- We went through 30+ iterations of content.  
+- I asked it to regenerate the full draft 3 times.  
+- We explored 8+ different angles — definitions, scoring, optimism bias, UI/UX, single vs federated, pros/cons, decision matrix, usage guidance.  
+- If I’d done this solo, it would have been 12–15 hours of effort.  
+- And at every step, I anchored it with my own 15 years of ProjectWise admin experience and 25 years in the construction industry.  
+
+The irony isn’t lost on me — I’m calling out AI-driven noise on LinkedIn while using AI to produce this. But here’s the difference:
+
+Don’t use AI blindly. Use it as a partner or assistant — like dictating ideas to a colleague, or having someone help with the legwork. Let it research, challenge, and ask questions, but don’t trust the outputs fully. Always test, refine, and overlay your own real-world experience.
