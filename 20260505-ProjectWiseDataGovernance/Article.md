@@ -22,7 +22,7 @@ Most of us already have ways to:
 
 Where Benito’s approach helps is reducing the overhead. Especially around discipline folders and user lists. Define it once in the template, only create what you need. That’s solid.
 
-I’ve worked in setups where that was already happening. The foundations were there, colleagues built a UI to request disciplines, and the deployment script only created what was needed.
+I’ve worked in setups where that was already happening. The foundations were there, colleagues have built a UI to request disciplines, and the deployment script only created what was needed.
 
 That works well for getting a project up and running.
 
