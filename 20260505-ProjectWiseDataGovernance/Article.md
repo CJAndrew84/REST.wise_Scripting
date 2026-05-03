@@ -7,13 +7,11 @@ The approach was simple:
 - Run a script  
 - Build the ProjectWise structure  
 
-It’s good. It works. And to be honest, most of us have been doing some version of that for years.
+It’s good. It works. There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that. It makes sense.
 
-There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that. It makes sense.
+But the core idea, an Excel file driving project template creation, that part isn’t new (well to me).
 
-But the core idea—Excel driving project template creation—that part isn’t new.
-
-I’ve been working like that since around 2018 when I first became the Lead ProjectWise Admin for the Highways business in the UK at AECOM (what they call a GA).
+I’ve been working like that since around 2018 when I first became the Lead ProjectWise Admin for the Highways business in the UK at AECOM (what they call a GA). Credit should go to Gareth McClimonds and Mike Clarke for starting this approach.
 
 Driving template setup from Excel is a clear improvement over manually building everything in ProjectWise Administrator.
 
