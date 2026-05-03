@@ -1,39 +1,46 @@
 ## Why ProjectWise Templates Don’t Scale — And What to Do About It
 
-At Bentley Illuminate 2026, one of the sessions by Benito Perez Galan focused on automating ProjectWise project creation.
+I was at Bentley Illuminate 2026 in Berlin and sat in a session by Benito Perez Galan on automating ProjectWise project creation.
 
-The approach was straightforward:
-- Define your project in Excel  
-- Use a script to build the ProjectWise structure  
-- Reduce manual setup effort  
+The approach was simple:
+- Define the project in Excel  
+- Run a script  
+- Build the ProjectWise structure  
 
-It’s a solid step forward—and one many of us have been moving toward for years.
+It’s good. It works. And to be honest, most of us have been doing some version of that for years.
 
-There were also some practical elements in the session I’ll take away and use. In particular, the way Benito structured disciplines, their associated folders, and the user lists tied to them is something I’ll be adopting going forward. It’s a cleaner way of thinking about how discipline-based access and structure should be set up.
+There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that. It makes sense.
 
-I’ve been using a variation of this approach since around 2018, when I was working as a Lead ProjectWise Admin for the Highways business in the UK at AECOM (known internally as a GA role).
+But the core idea—Excel driving project creation—that part isn’t new.
 
-Driving template setup is a clear improvement over manual creation in ProjectWise Administrator.
+I’ve been working like that since around 2018 when I was a Lead ProjectWise Admin for the Highways business in the UK at AECOM (what they call a GA).
 
-What Benito’s session showed was project creation from Excel acting as the template. In reality, most of us already have ways to copy an existing template and deploy it as a project.
+Driving template setup from Excel is a clear improvement over manually building everything in ProjectWise Administrator.
 
-Where his approach adds value is in reducing the overhead—particularly around discipline folder structures and associated user lists—by defining that directly in the template.
+Most of us already have ways to:
+- Copy a template  
+- Spin up a project  
+- Get going quickly  
 
-That’s something I’ve worked with before. The foundations were already in place from predecessors, and colleagues built a UI to allow project requests to specify the disciplines required. The deployment script then only creates what’s needed for that project, rather than everything by default.
+Where Benito’s approach helps is reducing the overhead. Especially around discipline folders and user lists. Define it once in the template, only create what you need. That’s solid.
 
-That works well for setup.
+I’ve worked in setups where that was already happening. The foundations were there, colleagues built a UI to request disciplines, and the deployment script only created what was needed.
 
-But the part I’m more interested in now is different.
+That works well for getting a project up and running.
 
-> It’s less about how we create templates, and more about how we document, govern, and track them over time.
+But that’s not really the problem I’m interested in anymore.
 
-The aim is simple:
+> It’s not about how we create templates.  
+> It’s about how we understand them, control them, and keep track of what’s changed.
 
-> If someone joins the business tomorrow, they should be able to understand what the current template is, how it got there, and why it’s been set up that way.
+If someone joins tomorrow, can they answer:
+- What does the current template actually look like?
+- How did it get there?
+- Why is it set up that way?
 
-That’s the gap I think still exists.
+Most of the time, the answer is no.
 
-And it’s what I’ve been focusing on more recently.
+That’s the gap.
 
 ---
 
@@ -43,313 +50,286 @@ And it’s what I’ve been focusing on more recently.
 
 ## The Real Issue Isn’t Setup… It’s Control
 
-Most organisations still treat ProjectWise templates as:
+ProjectWise templates in most organisations are:
 - Static  
-- Manual to manage  
-- Difficult to compare  
-- Hard to govern at scale  
+- Manually managed  
+- Hard to compare  
+- Hard to explain  
 
-That leads to familiar issues:
-- Inconsistent project setups  
-- Template drift between environments (DEV / UAT / PROD)  
-- Limited visibility of what’s actually been deployed  
-- Governance that is reactive rather than proactive  
+Which leads to:
+- Inconsistent setups  
+- Drift between DEV / UAT / PROD  
+- No real visibility of what’s deployed  
+- Governance that happens after the problem  
 
-So while automating setup is useful, it doesn’t answer a more important question:
+So yes, automate setup—but that’s only part of it.
 
-> How do you control, validate, and continuously improve your ProjectWise environment over time?
+The bigger question is:
+
+> How do you know what you’ve actually built… and whether it’s still right?
 
 ---
 
-Before going further, it’s worth asking a simple question:
+Before going further, it’s worth asking:
 
-> How many of you reading this have inherited a ProjectWise setup you didn’t build?
+> How many of you have inherited a ProjectWise setup you didn’t build?
 
-Something that:
-- You don’t fully understand  
-- May have some documentation  
-- Probably doesn’t  
+Something where:
+- You don’t fully understand it  
+- There might be documentation  
+- There probably isn’t  
 
-That’s a fairly common situation.
+That’s pretty common.
 
-And it’s where this approach starts to help.
+And it’s exactly where this approach helps.
 
 ---
 
 ## A Different Way to Look at It
 
-The shift I’ve been working toward is this:
+The shift for me has been this:
 
-> Stop treating templates as configuration, and start treating them as structured data.
+> Stop treating templates as configuration.  
+> Start treating them as data.
 
-Once you do that, a few things become possible:
-- You can extract your current ProjectWise setup into a structured format  
-- You can compare environments properly  
-- You can promote changes through DEV → UAT → PROD  
-- You can validate compliance against governance rules  
+Once you do that:
+- You can extract what’s actually there  
+- You can compare environments  
+- You can see what’s changed  
+- You can start validating it  
 
 You move from:
-- “Did we set this project up correctly?”  
+- “I think this is set up correctly”
 
 to:
-- “Is our environment consistently aligned with how we say it should be configured?”
+- “I can show exactly how this is set up”
 
 ---
 
-## My Approach: Treat the Setup as Data
+## My Approach
 
-Instead of starting with a template and trying to make it fit every project, I extract the actual configuration out of ProjectWise into a structured format.
+Instead of just building templates, I extract the setup out of ProjectWise into a structured format.
 
 At the moment, that’s Excel.
 
-That includes:
+It pulls things like:
 - Folder structures  
 - Workflows  
-- Security (User Lists / Groups)  
+- User Lists / Groups  
 - Environments and attributes  
-- Document codes and metadata  
-- Views, rules, lookup tables and more  
+- Document codes  
+- Views, rules, lookup tables  
 
-The key point is:
+The key point:
 
-> This represents what is actually deployed—not what we think is deployed.
+> This is what’s actually deployed—not what someone thinks is deployed.
 
 ---
 
-## From Workbook to Data Pipeline
+## From Excel to Something More Useful
 
-The first version of this approach exports everything into a single Excel workbook.
+First step is Excel.
 
-That gives one structured view of the setup across:
-- Environments and attributes  
-- Workflows and states  
-- Views  
-- Attribute exchange rules  
-- Rich project definitions  
-- Lookup tables  
-- WRE rules  
-- Folder structures  
-- Access control  
-- Project resources  
-- Disciplines and user lists  
+One workbook, multiple sheets:
+- Environments  
+- Workflows  
+- States  
+- Folders  
+- Access Control  
+- User Lists  
+- etc  
 
-That alone is useful—it makes the setup visible.
+All in one place.
 
-But Excel isn’t the end goal.
+That alone is useful because you can actually see it.
 
-The next step is exporting the same information to JSON.
+---
 
-That matters because JSON can be:
+[IMAGE PLACEHOLDER: Excel workbook with multiple tabs]
+
+---
+
+But Excel isn’t the end game.
+
+Next step is exporting the same thing to JSON.
+
+Because JSON:
+- Can be versioned  
 - Compared  
-- Versioned  
 - Queried  
 - Used in pipelines  
-- Fed into validation and reporting  
 
-> Excel makes the setup understandable.  
-> JSON makes it automatable.
-
----
-
-[IMAGE PLACEHOLDER: Excel workbook with multiple configuration sheets]
-
-[IMAGE PLACEHOLDER: JSON diff or version comparison in repository]
+> Excel helps you understand it.  
+> JSON lets you do something with it.
 
 ---
 
-## How This Works in Practice
-
-The process I’m working toward looks like this:
-
-### 1. Define the Template in Excel
-The Excel workbook becomes the structured definition of the setup.
+[IMAGE PLACEHOLDER: JSON diff / version comparison]
 
 ---
 
-### 2. Deploy to Development
-PowerShell scripts deploy that definition into a Development datasource.
+## How This Works (Without Overcomplicating It)
 
-This is where the template is built and tested properly.
+The flow is simple:
 
----
+### 1. Define it in Excel  
+That’s your template definition.
 
-### 3. Capture the Deployed State (JSON)
-Once it’s working, the deployed configuration is exported to JSON and stored in a repository (Azure DevOps in my case, GitHub would work the same).
+### 2. Deploy to Development  
+Use PowerShell to build it in a DEV datasource.
 
-> This captures what was actually deployed—not just what was intended.
+### 3. Export to JSON  
+Capture what actually got deployed and store it in a repo (Azure DevOps / GitHub).
 
----
+### 4. Deploy to UAT  
+Let users test it properly.
 
-### 4. Promote to UAT
-The template is deployed into a UAT datasource for user validation.
-
-Workflows, metadata, and usability get tested in a real context.
-
----
-
-### 5. Feed Changes Back Properly
-Any changes from UAT or Production are not patched directly.
-
-Instead:
-- Update the Excel definition  
-- Redeploy to Development  
-- Re-test  
+### 5. Feed changes back properly  
+No patching in UAT or PROD:
+- Update Excel  
+- Redeploy  
 - Re-export JSON  
-- Commit to the repository  
+- Commit  
+
+### 6. Deploy to Production  
+Same process.
+
+### 7. Track everything  
+Git shows:
+- What changed  
+- When  
+- Why  
+
+It’s not about code—it’s about configuration history.
 
 ---
 
-### 6. Deploy to Production
-Once validated, the same process pushes the template to Production.
+[IMAGE PLACEHOLDER: DEV → UAT → PROD diagram]
 
 ---
 
-### 7. Track Change Over Time
-Because each JSON export is version-controlled:
-- You can see exactly what changed  
-- You can track when and why it changed  
-- You can compare environments properly  
+## Where This Is Going
 
-Git becomes useful here—not for code, but for configuration history.
+Once the setup is structured and versioned, you can start layering things on top.
 
----
+### Pipelines  
+Make the process repeatable.
 
-[IMAGE PLACEHOLDER: DEV → UAT → PROD flow diagram with Excel + JSON + Git]
+### Dashboards  
+Actually see:
+- What’s aligned  
+- What’s not  
+- What’s changed  
 
----
+### Validation  
+Check things like:
+- Naming  
+- Attributes  
+- Workflows  
+- Folder structures  
+- Access  
 
-## Where This Is Heading
-
-Once the setup is structured and version-controlled, you can start adding control around how it evolves.
-
-### Pipelines
-Formalise the process:
-- Define → Deploy → Capture → Promote  
-
-Make it repeatable and traceable.
-
----
-
-### Dashboards
-Surface the state of the environment:
-- Which templates align with governance  
-- Where environments differ  
-- What has changed over time  
+If something’s off, flag it.
 
 ---
 
-### Automated Validation
-Start checking the setup against expected rules:
-- Naming conventions  
-- Required attributes  
-- Workflow structures  
-- Folder hierarchies  
-- Access control  
+## Exceptions (Because There Always Are)
 
-When something falls outside of that, it gets flagged.
+Not everything will follow the standard.
 
----
+That’s fine.
 
-## Handling Exceptions Properly
+The point isn’t to block it—it’s to make it visible.
 
-Not everything will fit governance—and that’s fine.
+If something doesn’t follow governance:
 
-The aim isn’t to block work.
+> You should have to explain why.
 
-It’s to make deviations visible.
-
-If something is built outside the expected structure:
-
-> The administrator should be prompted to document the reason for the exemption.
-
-That way:
-- Exceptions are recorded  
-- Decisions are visible  
-- Patterns can be reviewed over time  
+That’s it.
 
 ---
 
-## What This Changes
+## What This Actually Changes
 
-This isn’t about making setup faster.
+This isn’t about speed.
 
-It’s about changing how ProjectWise is managed:
+It’s about control.
 
-- From templates → to data-driven definitions  
-- From manual checks → to repeatable validation  
-- From drift → to controlled alignment  
+- Templates → data  
+- Guesswork → visibility  
+- Drift → alignment  
 
-And importantly:
+And most importantly:
 
-> From reacting to issues  
-> to being able to see them before they become problems.
+> You stop reacting to problems after they happen.
 
 ---
 
 ## Reality Check
 
-This isn’t a finished solution.
+This isn’t finished.
 
-It still depends on:
-- Clean, structured data  
-- Discipline in how changes are made  
-- A clear definition of what “good” looks like  
+It depends on:
+- Good data  
+- Discipline  
+- Knowing what “good” looks like  
 
-Excel is just a starting point—not the end state.
+Excel is just the start.
 
 ---
 
 ## Final Thought
 
-Benito’s session showed how we can automate project creation.
+Benito showed how to automate project creation.
 
-This is really about the next step:
+That’s useful.
 
-> How do we control, validate, and continuously improve what we’ve created?
+But the next step is:
 
-One practical example of where this can go:
+> How do you control what you’ve built over time?
 
-I recently took one of the exported Excel templates and asked AI to review it.
+One example of where this goes:
 
-It picked up something that isn’t always obvious when you’re working inside ProjectWise—cascading triggers within environments.
+I took one of the Excel exports and gave it to AI to review.
 
-On paper, they looked fine.
+It picked up cascading triggers in the environments.
 
-In practice, the AI flagged that advancing even a relatively small number of files through a workflow could cause performance bottlenecks because of how those triggers interact.
+Something that looks fine when you’re setting it up.
 
-That’s the kind of issue that’s easy to miss, especially as templates grow over time.
+But when you start pushing files through workflows, those triggers stack up and can cause performance issues.
 
-It’s not about replacing experience—it’s about having another way to interrogate the setup once it’s structured and visible.
+That’s not always obvious when you’re in ProjectWise.
 
----
-
-[IMAGE PLACEHOLDER: Screenshot of AI response highlighting cascading triggers / performance concern]
+But when the data is structured, AI can see patterns you might miss.
 
 ---
 
-And this is where it becomes more useful day-to-day.
+[IMAGE PLACEHOLDER: AI response highlighting cascading triggers]
 
-Once the setup exists in a structured format—whether that’s Excel or JSON—you can start to use AI to:
+---
 
-- Explain how the template is structured  
-- Describe workflows and state transitions  
-- Highlight dependencies and triggers  
-- Generate simple flow diagrams showing how things behave  
+And this is where it gets more useful.
 
-You’re no longer limited to digging through ProjectWise Administrator trying to piece things together.
+Once the setup is in Excel or JSON, you can ask AI to:
+- Explain the template  
+- Describe workflows  
+- Map triggers  
+- Generate flow diagrams  
+
+You’re not digging around in ProjectWise trying to figure it out.
 
 And more importantly:
 
-> You’re no longer in the position of saying  
+> You’re not saying  
 > “I don’t support that—I didn’t build it.”
 
 ---
 
-## Interested to hear how others are approaching this
+## Interested to hear how others are handling this
 
 Are you:
-- Still relying on static templates?  
-- Using structured inputs for setup?  
-- Doing anything around comparison or validation across environments?  
+- Still using static templates?  
+- Using Excel to drive setup?  
+- Doing anything around comparison or validation?  
 
-Would be good to compare approaches—especially where things start to scale.
+Genuinely interested—especially where this starts to scale.
