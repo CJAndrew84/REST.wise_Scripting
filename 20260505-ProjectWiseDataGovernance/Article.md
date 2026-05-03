@@ -11,7 +11,7 @@ It’s good. It works. And to be honest, most of us have been doing some version
 
 There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that. It makes sense.
 
-But the core idea—Excel driving project creation—that part isn’t new.
+But the core idea—Excel driving project template creation—that part isn’t new.
 
 I’ve been working like that since around 2018 when I was a Lead ProjectWise Admin for the Highways business in the UK at AECOM (what they call a GA).
 
