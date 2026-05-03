@@ -7,9 +7,9 @@ The approach was simple:
 - Run a script  
 - Build the ProjectWise structure  
 
-It’s good. It works. There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that. It makes sense.
+It’s good. It works. There were a couple of things I’ll take away from it. The way Benito structured disciplines, their folders, and the user lists tied to them was clean. I’ll use that.
 
-But the core idea, an Excel file driving project template creation, that part isn’t new (well to me).
+But the core idea, an Excel file driving template creation, isn’t new (well to me).
 
 I’ve been working like that since around 2018 when I first became the Lead ProjectWise Admin for the Highways business in the UK at AECOM (what they call a GA). Credit should go to Gareth McClimonds and Mike Clarke for starting this approach.
 
@@ -20,16 +20,16 @@ Most of us already have ways to:
 - Spin up a project  
 - Get going quickly  
 
-Where Benito’s approach helps is reducing the overhead. Especially around discipline folders and user lists. Define it once in the template, only create what you need. That’s solid.
+Where Benito’s approach helps is reducing the overhead, especially around discipline folders and user lists. Define it once in the template, only create what you need.
 
-I’ve worked in setups where that was already happening. The foundations were there, colleagues have built a UI to request disciplines, and the deployment script only created what was needed.
+I’ve worked in setups where that was already happening. The foundations were there, colleagues built a UI to request disciplines, and the deployment script only created what was needed.
 
 That works well for getting a project up and running.
 
 But that’s not really the problem I’m interested in anymore.
 
 > It’s not about how we create templates.  
-> It's not even about how we create projects from those templates.
+> It’s not even about how we create projects from those templates.  
 > It’s about how we understand them, control them, and keep track of what’s changed.
 
 If someone joins tomorrow, can they answer:
@@ -39,7 +39,7 @@ If someone joins tomorrow, can they answer:
 
 Most of the time, the answer is no.
 
-That’s the gap.
+That’s the gap I still see in most setups.
 
 ---
 
@@ -61,11 +61,11 @@ Which leads to:
 - No real visibility of what’s deployed  
 - Governance that happens after the problem  
 
-So yes, automate setup—but that’s only part of it.
+So yes, automate setup, but that’s only part of it.
 
 The bigger question is:
 
-> How do you know what you’ve actually built… and whether it’s still right?
+> How do you know what you’ve actually built, and whether it’s still right?
 
 ---
 
@@ -78,9 +78,7 @@ Something where:
 - There might be documentation  
 - There probably isn’t  
 
-That’s pretty common.
-
-And it’s exactly where this approach helps.
+That’s pretty common, and it’s exactly where this approach helps.
 
 ---
 
@@ -121,7 +119,7 @@ It pulls things like:
 
 The key point:
 
-> This is what’s actually deployed—not what someone thinks is deployed.
+> This is what’s actually deployed, not what someone thinks is deployed.
 
 ---
 
@@ -140,7 +138,7 @@ One workbook, multiple sheets:
 
 All in one place.
 
-That alone is useful because you can actually see it.
+That alone is useful because you can actually see it, instead of jumping between ProjectWise Administrator screens trying to piece it together.
 
 ---
 
@@ -167,7 +165,7 @@ Because JSON:
 
 ---
 
-## How This Works (Without Overcomplicating It)
+## How This Works
 
 The flow is simple:
 
@@ -199,7 +197,7 @@ Git shows:
 - When  
 - Why  
 
-It’s not about code—it’s about configuration history.
+It’s not about code, it’s about configuration history.
 
 ---
 
@@ -215,13 +213,13 @@ Once the setup is structured and versioned, you can start layering things on top
 Make the process repeatable.
 
 ### Dashboards  
-Actually see:
+See:
 - What’s aligned  
 - What’s not  
 - What’s changed  
 
 ### Validation  
-Check things like:
+Check:
 - Naming  
 - Attributes  
 - Workflows  
@@ -238,13 +236,11 @@ Not everything will follow the standard.
 
 That’s fine.
 
-The point isn’t to block it—it’s to make it visible.
+The point isn’t to block it, it’s to make it visible.
 
 If something doesn’t follow governance:
 
 > You should have to explain why.
-
-That’s it.
 
 ---
 
@@ -257,8 +253,6 @@ It’s about control.
 - Templates → data  
 - Guesswork → visibility  
 - Drift → alignment  
-
-And most importantly:
 
 > You stop reacting to problems after they happen.
 
@@ -297,7 +291,7 @@ Something that looks fine when you’re setting it up.
 
 But when you start pushing files through workflows, those triggers stack up and can cause performance issues.
 
-That’s not always obvious when you’re in ProjectWise.
+That’s not always obvious when you’re working inside ProjectWise.
 
 But when the data is structured, AI can see patterns you might miss.
 
@@ -317,10 +311,8 @@ Once the setup is in Excel or JSON, you can ask AI to:
 
 You’re not digging around in ProjectWise trying to figure it out.
 
-And more importantly:
-
 > You’re not saying  
-> “I don’t support that—I didn’t build it.”
+> “I don’t support that, I didn’t build it.”
 
 ---
 
@@ -331,4 +323,4 @@ Are you:
 - Using Excel to drive setup?  
 - Doing anything around comparison or validation?  
 
-Genuinely interested—especially where this starts to scale.
+Genuinely interested, especially where this starts to scale.
