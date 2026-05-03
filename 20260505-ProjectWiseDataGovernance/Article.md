@@ -29,6 +29,7 @@ That works well for getting a project up and running.
 But that’s not really the problem I’m interested in anymore.
 
 > It’s not about how we create templates.  
+> It's not even about how we create projects from those templates.
 > It’s about how we understand them, control them, and keep track of what’s changed.
 
 If someone joins tomorrow, can they answer:
